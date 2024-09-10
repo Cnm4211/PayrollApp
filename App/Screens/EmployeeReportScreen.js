@@ -76,8 +76,17 @@ const EmployeeReportsScreen = ({ route, navigation }) => {
     return totalHours.toFixed(2);
   };
 
+  const weeklyHours = () => {
+    let sum = 0;
+    for (let i = 0; i < shiftsList.length; i++) {
+      sum += parseFloat(calculateHoursWorked(shiftsList[i]));
+    }
+    return sum;
+  }
+
   return (
     <View style={styles.container}>
+    <Text style={[styles.boxText, {marginBottom: 20, marginLeft: 1}]}><Text style={[styles.boldText, { fontSize: 22 }]}>Total Hours: </Text> {weeklyHours()} Hours</Text>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {shiftsList.length > 0 ? (
           shiftsList.map((shift, index) => (

@@ -48,50 +48,60 @@ const ShiftReportScreen = () => {
   const UID = auth.currentUser.uid;
   const [completedShifts, setCompletedShifts] = useState([]);
 
-    useEffect(() => {
-      const fetchShifts = () => {
-        try {
-          // Directly access the user's document using their UID
-          const userDocRef = doc(db, "users", UID);
-    
-          // Set up a real-time listener for the user's document
-          const unsubscribe = onSnapshot(userDocRef, (userDoc) => {
-            if (userDoc.exists()) {
-              const userData = userDoc.data();
-    
-              // Check if shifts array exists and is valid
-              if (userData.shifts && Array.isArray(userData.shifts)) {
-                const shifts = userData.shifts.map(shift => ({
-                  ...shift,
-                  clockIn: shift.clockIn ? shift.clockIn.toDate() : null,
-                  clockOut: shift.clockOut ? shift.clockOut.toDate() : null,
-                  lunchIn: shift.lunchIn ? shift.lunchIn.toDate() : null,
-                  lunchOut: shift.lunchOut ? shift.lunchOut.toDate() : null,
-                }));
-    
-                setCompletedShifts(shifts);
-              } else {
-                console.warn("No shifts array found or it is not an array.");
-              }
+  useEffect(() => {
+    const fetchShifts = () => {
+      try {
+        // Directly access the user's document using their UID
+        const userDocRef = doc(db, "users", UID);
+
+        // Set up a real-time listener for the user's document
+        const unsubscribe = onSnapshot(userDocRef, (userDoc) => {
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+
+            // Check if shifts array exists and is valid
+            if (userData.shifts && Array.isArray(userData.shifts)) {
+              const shifts = userData.shifts.map(shift => ({
+                ...shift,
+                clockIn: shift.clockIn ? shift.clockIn.toDate() : null,
+                clockOut: shift.clockOut ? shift.clockOut.toDate() : null,
+                lunchIn: shift.lunchIn ? shift.lunchIn.toDate() : null,
+                lunchOut: shift.lunchOut ? shift.lunchOut.toDate() : null,
+              }));
+
+              setCompletedShifts(shifts);
             } else {
-              console.warn("No such document!");
+              console.warn("No shifts array found or it is not an array.");
             }
-          });
-    
-          // Clean up the listener when the component unmounts
-          return () => unsubscribe();
-    
-        } catch (e) {
-          console.error("Error Fetching Shifts", e);
-        }
-      };
-    
-      fetchShifts();
-    }, [UID]);
+          } else {
+            console.warn("No such document!");
+          }
+        });
+
+        // Clean up the listener when the component unmounts
+        return () => unsubscribe();
+
+      } catch (e) {
+        console.error("Error Fetching Shifts", e);
+      }
+    };
+
+    fetchShifts();
+  }, [UID]);
+
+
+  const weeklyHours = () => {
+    let sum = 0;
+    for (let i = 0; i < completedShifts.length; i++) {
+      sum += parseFloat(calculateHoursWorked(completedShifts[i]));
+    }
+    return sum;
+  }
 
   return (
     <View style={styles.container}>
       <Text style={styles.subHeader}>Completed Shifts</Text>
+      <Text style={[styles.boxText, {marginBottom:20, marginLeft:1}]}><Text style={[styles.boldText, { fontSize: 22 }]}>Total Hours: </Text> {weeklyHours()} Hours</Text>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {completedShifts.length > 0 ? (
           completedShifts.map((shift, index) => (
