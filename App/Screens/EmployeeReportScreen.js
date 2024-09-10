@@ -81,7 +81,7 @@ const EmployeeReportsScreen = ({ route, navigation }) => {
     for (let i = 0; i < shiftsList.length; i++) {
       sum += parseFloat(calculateHoursWorked(shiftsList[i]));
     }
-    return sum;
+    return parseFloat(sum.toFixed(2));
   }
 
   return (
