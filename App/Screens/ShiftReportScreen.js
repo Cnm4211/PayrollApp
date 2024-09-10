@@ -52,7 +52,7 @@ const ShiftReportScreen = () => {
     const fetchShifts = () => {
       try {
         // Directly access the user's document using their UID
-        const userDocRef = doc(db, "users", UID);
+        const userDocRef = doc(db, 'users2', UID);
 
         // Set up a real-time listener for the user's document
         const unsubscribe = onSnapshot(userDocRef, (userDoc) => {
@@ -95,13 +95,13 @@ const ShiftReportScreen = () => {
     for (let i = 0; i < completedShifts.length; i++) {
       sum += parseFloat(calculateHoursWorked(completedShifts[i]));
     }
-    return sum;
+    return parseFloat(sum.toFixed(2));
   }
 
   return (
     <View style={styles.container}>
       <Text style={styles.subHeader}>Completed Shifts</Text>
-      <Text style={[styles.boxText, {marginBottom:20, marginLeft:1}]}><Text style={[styles.boldText, { fontSize: 22 }]}>Total Hours: </Text> {weeklyHours()} Hours</Text>
+      <Text style={[styles.boldText, {marginBottom:20, marginLeft:-4, fontSize: 22}]}> Total Hours: {weeklyHours()} Hours</Text> 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {completedShifts.length > 0 ? (
           completedShifts.map((shift, index) => (

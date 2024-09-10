@@ -22,7 +22,7 @@ const UserTabs = () => {
             //console.log("Fetching Role");
             try {
                 // Directly access the user's document using their UID
-                const userDocRef = doc(db, "users", UID);
+                const userDocRef = doc(db, 'users2', UID);
                 const userDoc = await getDoc(userDocRef);
 
                 if (userDoc.exists()) {

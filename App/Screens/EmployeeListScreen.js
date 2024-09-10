@@ -9,7 +9,7 @@ const EmployeeListScreen = ({ navigation }) => {
 
   useEffect(() => {
     const fetchEmployees = async () => {
-      const q = query(collection(db, 'users'));
+      const q = query(collection(db, 'users2'));
       const unsubscribe = onSnapshot(q, async (querySnapshot) => {
         const newEmployeeDict = {};
 
@@ -33,7 +33,7 @@ const EmployeeListScreen = ({ navigation }) => {
 
   const fetchShifts = async (UID) => {
     try {
-      const userDocRef = doc(db, "users", UID);
+      const userDocRef = doc(db, 'users2', UID);
       const userDoc = await getDoc(userDocRef);
 
       if (userDoc.exists()) {

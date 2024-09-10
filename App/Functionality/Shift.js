@@ -1,5 +1,7 @@
 import { collection, addDoc, doc, updateDoc, getDocs, getDoc, query, where, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '../firebase';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 class Shift {
   constructor(username, clockIn, clockOut = null, lunchIn = null, lunchOut = null) {
@@ -9,6 +11,7 @@ class Shift {
     this.lunchIn = lunchIn;
     this.lunchOut = lunchOut;
   }
+
   static getStartOfWeek() {
     const today = new Date();
     const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
@@ -21,18 +24,22 @@ class Shift {
 
   static async createShift(uid, clockIn) {
     try {
-
-      const userRef = doc(db, 'users', uid);
-
+      const userRef = doc(db, 'users2', uid);
       const userSnap = await getDoc(userRef);
       let currentShifts = userSnap.data().shifts || [];
-      const lastResetDate = userSnap.data().lastResetDate?.toDate() || this.getStartOfWeek();
 
       const now = new Date();
+      let lastResetDate = userSnap.data().lastResetDate?.toDate();
+
+      if (!lastResetDate) {
+        // If lastResetDate doesn't exist, set it to the start of the current week
+        lastResetDate = this.getStartOfWeek();
+      }
 
       // Check if we need to reset shifts
       if (now >= this.getStartOfWeek() && lastResetDate < this.getStartOfWeek()) {
         currentShifts = []; // Reset the shifts array
+        lastResetDate = this.getStartOfWeek();
       }
 
       if (currentShifts.length >= 7) {
@@ -49,9 +56,10 @@ class Shift {
 
       currentShifts.push(newShift);
 
-      // Add the new shift to the user's shifts array
+      // Update the user document with the new shift and lastResetDate
       await updateDoc(userRef, {
         shifts: currentShifts,
+        lastResetDate: lastResetDate
       });
 
       return newShift;
@@ -63,7 +71,7 @@ class Shift {
 
   static async updateShift(uid, clockIn, updates) {
     try {
-      const userRef = doc(db, 'users', uid);
+      const userRef = doc(db, 'users2', uid);
       const userDoc = await getDoc(userRef);
       const userData = userDoc.data();
 
@@ -93,7 +101,7 @@ class Shift {
 
   static async getCompletedShifts(uid) {
     try {
-      const userRef = doc(db, 'users', uid);
+      const userRef = doc(db, 'users2', uid);
       const userDoc = await getDoc(userRef);
       const userData = userDoc.data();
 
@@ -106,6 +114,16 @@ class Shift {
       throw e;
     }
   }
+
+  static async getLastReset() {
+    if (!this.lastResetDate) {
+      const storedDate = await AsyncStorage.getItem('lastResetDate');
+      this.lastResetDate = storedDate ? new Date(JSON.parse(storedDate)) : this.getStartOfWeek();
+    }
+    return this.lastResetDate;
+  }
 }
+
+
 
 export default Shift;

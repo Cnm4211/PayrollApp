@@ -30,7 +30,7 @@ const LoginScreen = () => {
 
     const fetchUserData = async (uid) => {
         try {
-            const userDocRef = doc(db, 'users', uid);
+            const userDocRef = doc(db, 'users2', uid);
             const userDoc = await getDoc(userDocRef);
     
             if (userDoc.exists()) {
@@ -80,7 +80,7 @@ const LoginScreen = () => {
                 shifts: []
             };
     
-            await setDoc(doc(db, 'users', user.uid), userData);
+            await setDoc(doc(db, 'users2', user.uid), userData);
             await AsyncStorage.setItem('userData', JSON.stringify(userData));
             fetchUserData(user.uid);
         } catch (error) {

@@ -18,7 +18,7 @@ const EmployeeReportsScreen = ({ route, navigation }) => {
   useEffect(() => {
     const fetchShifts = async () => {
       try {
-        const userDocRef = doc(db, "users", UID);
+        const userDocRef = doc(db, 'users2', UID);
         const unsubscribe = onSnapshot(userDocRef, (userDoc) => {
           if (userDoc.exists()) {
             const userData = userDoc.data();
@@ -86,7 +86,7 @@ const EmployeeReportsScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-    <Text style={[styles.boxText, {marginBottom: 20, marginLeft: 1}]}><Text style={[styles.boldText, { fontSize: 22 }]}>Total Hours: </Text> {weeklyHours()} Hours</Text>
+    <Text style={[styles.boldText, {marginBottom:20, marginLeft:-4, fontSize: 22}]}> Total Hours: {weeklyHours()} Hours</Text> 
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {shiftsList.length > 0 ? (
           shiftsList.map((shift, index) => (

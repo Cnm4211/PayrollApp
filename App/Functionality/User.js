@@ -13,7 +13,7 @@ class User {
 
     static async createUser(username, password, role) {
         try {
-            const userRef = doc(firestore, 'users', username);
+            const userRef = doc(firestore, 'users2', username);
             await setDoc(userRef, {
                 password: password,
                 role: role,
@@ -30,7 +30,7 @@ class User {
 
     static async getUser(username) {
         try {
-            const userRef = doc(firestore, 'users', username);
+            const userRef = doc(firestore, 'users2', username);
             const userDoc = await getDoc(userRef);
             if (userDoc.exists()) {
                 const userData = userDoc.data();
@@ -59,7 +59,7 @@ class User {
         };
 
         try {
-            const userRef = doc(firestore, 'users', this.username);
+            const userRef = doc(firestore, 'users2', this.username);
             await updateDoc(userRef, {
                 clockedIn: true,
                 currentShift: this.currentShift,
@@ -77,7 +77,7 @@ class User {
         this.currentShift.clockOut = clockOutTime;
 
         try {
-            const userRef = doc(firestore, 'users', this.username);
+            const userRef = doc(firestore, 'users2', this.username);
             await updateDoc(userRef, {
                 clockedIn: false,
                 currentShift: null,
@@ -96,7 +96,7 @@ class User {
 
         try {
             this.currentShift.lunchBreaks.push({ start: lunchInTime });
-            const userRef = doc(firestore, 'users', this.username);
+            const userRef = doc(firestore, 'users2', this.username);
             await updateDoc(userRef, {
                 atLunch: true,
                 currentShift: this.currentShift,
@@ -115,7 +115,7 @@ class User {
         try {
             const lastLunchBreak = this.currentShift.lunchBreaks[this.currentShift.lunchBreaks.length - 1];
             lastLunchBreak.end = lunchOutTime;
-            const userRef = doc(firestore, 'users', this.username);
+            const userRef = doc(firestore, 'users2', this.username);
             await updateDoc(userRef, {
                 atLunch: false,
                 currentShift: this.currentShift,

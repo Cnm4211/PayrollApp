@@ -28,7 +28,7 @@ const HomeScreen = () => {
 
     const fetchShifts = async () => {
         try {
-            const userDocRef = doc(db, "users", UID);
+            const userDocRef = doc(db, 'users2', UID);
             const userDoc = await getDoc(userDocRef);
 
             if (userDoc.exists()) {
@@ -86,11 +86,22 @@ const HomeScreen = () => {
                 }
 
                 if (storedCurrentShift) {
-                    setCurrentShift(JSON.parse(storedCurrentShift));
+                    const parsedShift = JSON.parse(storedCurrentShift);
+                    setCurrentShift({
+                        clockIn: parsedShift.clockIn ? new Date(parsedShift.clockIn) : null,
+                        clockOut: parsedShift.clockOut ? new Date(parsedShift.clockOut) : null,
+                        lunchIn: parsedShift.lunchIn ? new Date(parsedShift.lunchIn) : null,
+                        lunchOut: parsedShift.lunchOut ? new Date(parsedShift.lunchOut) : null,
+                    });
                 }
 
                 if (storedLunchStartTime) {
                     setLunchStartTime(new Date(JSON.parse(storedLunchStartTime)));
+                }
+
+                const storedHasBeenToLunch = await AsyncStorage.getItem('hasBeenToLunch');
+                if (storedHasBeenToLunch !== null) {
+                    setHasBeenToLunch(JSON.parse(storedHasBeenToLunch));
                 }
 
                 setLunchButtonVisible(JSON.parse(storedClockedIn) && !JSON.parse(storedAtLunch));
@@ -106,7 +117,7 @@ const HomeScreen = () => {
                 if (!documentId) {
                     setDocumentId(UID);
                 }
-                const userDocRef = doc(db, "users", UID);
+                const userDocRef = doc(db, 'users2', UID);
                 const userDoc = await getDoc(userDocRef);
 
                 if (userDoc.exists()) {
@@ -212,7 +223,7 @@ const HomeScreen = () => {
             setDocumentId(uid);
         } else {
             try {
-                const userDocRef = doc(db, 'users', documentId);
+                const userDocRef = doc(db, 'users2', documentId);
                 await updateDoc(userDocRef, { [field]: value });
 
                 const updatedUserData = { ...userData, [field]: value };
@@ -276,6 +287,7 @@ const HomeScreen = () => {
                             setTimerVisible(false);
                             setCurrentShift(updatedShift);
                             setHasBeenToLunch(false);
+                            await AsyncStorage.setItem('hasBeenToLunch', JSON.stringify(false));
                             setLastShift(updatedShift);
 
                             await AsyncStorage.removeItem('clockedIn');
@@ -344,6 +356,8 @@ const HomeScreen = () => {
                 setHasBeenToLunch(true);
                 await AsyncStorage.setItem('atLunch', JSON.stringify(false));
                 await AsyncStorage.setItem('lunchStart', JSON.stringify(null));
+                await AsyncStorage.setItem('hasBeenToLunch', JSON.stringify(true));
+                await AsyncStorage.setItem('currentShift', JSON.stringify(updatedShift));
 
             } catch (e) {
                 console.error('Error updating lunch out time: ', e);
