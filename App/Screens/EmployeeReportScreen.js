@@ -50,6 +50,32 @@ const EmployeeReportsScreen = ({ route, navigation }) => {
     fetchShifts();
   }, [UID]);
 
+  const calculateHoursWorked = (shift) => {
+    if (!shift || !shift.clockIn) {
+      console.error("Invalid shift data provided.");
+      return "N/A";
+    }
+  
+    if (!shift.clockOut) {
+      const now = new Date();
+      shift.clockOut = now;
+      //console.log("Was missing clock out, now has clock out of", now);
+    }
+  
+    const clockInTime = shift.clockIn.getTime();
+    const clockOutTime = shift.clockOut.getTime();
+    let totalHours = (clockOutTime - clockInTime) / 1000 / 3600;
+  
+    if (shift.lunchIn && shift.lunchOut) {
+      const lunchInTime = shift.lunchIn.getTime();
+      const lunchOutTime = shift.lunchOut.getTime();
+      const lunchDuration = (lunchOutTime - lunchInTime) / 1000 / 3600;
+      totalHours -= lunchDuration;
+    }
+  
+    return totalHours.toFixed(2);
+  };
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -66,6 +92,7 @@ const EmployeeReportsScreen = ({ route, navigation }) => {
                 <Text style={styles.boxText}><Text style={styles.boldText}>Clocked Out:</Text> {formatTime(shift.clockOut)}</Text>
                 <Text style={styles.boxText}><Text style={styles.boldText}>Lunch In:</Text> {formatTime(shift.lunchIn)}</Text>
                 <Text style={styles.boxText}><Text style={styles.boldText}>Lunch Out:</Text> {formatTime(shift.lunchOut)}</Text>
+                <Text style={styles.boxText}><Text style={styles.boldText}>Total Hours Worked:</Text> {calculateHoursWorked(shift)}</Text>
               </View>
             </View>
           ))
